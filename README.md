@@ -8,6 +8,34 @@ A lightweight, fast, signature-based malware scanner written in pure Python. It 
 * **Modular Signature Database:** Easily add or update threat hashes via `signatures.json`.
 * **CLI & Interactive Modes:** Supports both command-line flags and interactive terminal prompts.
 
+## 🏗️ Architecture & Workflow
+
+```mermaid
+flowchart TD
+    A([Start Scanner]) --> B{CLI Flag --path<br/>Provided?}
+    B -- Yes --> D[Validate Target Directory]
+    B -- No --> C[/Prompt User for Folder Path/]
+    C --> D
+    
+    D -- Invalid --> E([Print Error & Exit])
+    D -- Valid --> F[(Load signatures.json)]
+    
+    F --> G[Walk Directory Tree<br/>os.walk]
+    G --> H{More Files<br/>to Scan?}
+    
+    H -- No --> M([Print Final Summary<br/>Scanned & Threats Found])
+    H -- Yes --> I[Read File in 4KB Chunks<br/>Compute SHA-256]
+    
+    I -- Permission/OS Error --> H
+    I -- Hash Generated --> J{Hash in<br/>Signatures?}
+    
+    J -- No --> H
+    J -- Yes --> K[Print ALERT & Threat Name]
+    K --> L[Increment Threat Counter]
+    L --> H
+```
+
+
 ## 🚀 Getting Started
 
 ### Prerequisites
